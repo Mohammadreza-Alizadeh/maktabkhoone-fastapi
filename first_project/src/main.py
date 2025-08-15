@@ -64,3 +64,27 @@ def add_expense(
     EXPENSES_LIST.append(new_expense)
 
     return JSONResponse(content=new_expense, status_code=status.HTTP_201_CREATED)
+
+
+@app.delete("/expenses/{id}")
+def delete_expense(
+    expense_id: Annotated[
+        int,
+        Path(
+            gt=0,
+            title="Expense id to delete",
+            desc="i use this id to find desired expense and delete it",
+            alias="id",
+        ),
+    ],
+):
+    for item in EXPENSES_LIST:
+        if item["id"] == expense_id:
+            EXPENSES_LIST.remove(item)
+            return JSONResponse(
+                content={"detail": "deleted succesfully"},
+                status_code=status.HTTP_202_ACCEPTED,
+            )
+    return JSONResponse(
+        content={"detail": "not found"}, status_code=status.HTTP_404_NOT_FOUND
+    )
