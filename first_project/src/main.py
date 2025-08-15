@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import FastAPI, Path, status
+from fastapi import Body, FastAPI, Path, status
 from fastapi.responses import JSONResponse
 
 
@@ -9,7 +9,12 @@ EXPENSES_LIST: list[dict] = [
     {"id": 3, "description": "snap", "amount": 100.7},
 ]
 
-last_used_id: int = 3
+
+def generate_new_id():
+    last_expense_pushed = EXPENSES_LIST[-1]
+    new_id = last_expense_pushed["id"] + 1
+    return new_id
+
 
 app = FastAPI()
 
@@ -37,3 +42,25 @@ def get_expense(
     return JSONResponse(
         content={"detail": "not found"}, status_code=status.HTTP_404_NOT_FOUND
     )
+
+
+@app.post("/expenses")
+def add_expense(
+    description: Annotated[
+        str, Body(title="Expence Description", description="What this expense is for ?")
+    ],
+    amount: Annotated[
+        float,
+        Body(
+            gt=0, title="Expence Amount", description="How much moneu did you spend ?"
+        ),
+    ],
+):
+    new_expense = {
+        "id": generate_new_id(),
+        "description": description,
+        "amount": amount,
+    }
+    EXPENSES_LIST.append(new_expense)
+
+    return JSONResponse(content=new_expense, status_code=status.HTTP_201_CREATED)
