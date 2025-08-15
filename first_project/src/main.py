@@ -88,3 +88,44 @@ def delete_expense(
     return JSONResponse(
         content={"detail": "not found"}, status_code=status.HTTP_404_NOT_FOUND
     )
+
+
+@app.put("/expenses/{id}")
+def delete_expense(
+    expense_id: Annotated[
+        int,
+        Path(
+            gt=0,
+            title="Expense id to update",
+            desc="i use this id to find desired expense and update it",
+            alias="id",
+        ),
+    ],
+    new_description: Annotated[
+        str,
+        Body(
+            title="New Description",
+            desc="new description to update",
+        ),
+    ],
+    new_amount: Annotated[
+        float,
+        Body(
+            gt=0,
+            title="New Amount",
+            desc="new amount to update",
+        ),
+    ],
+):
+    for item in EXPENSES_LIST:
+        if item["id"] == expense_id:
+            item["description"] = new_description
+            item["amount"] = new_amount
+
+            return JSONResponse(
+                content={"detail": "updated succesfully"},
+                status_code=status.HTTP_200_OK,
+            )
+    return JSONResponse(
+        content={"detail": "not found"}, status_code=status.HTTP_404_NOT_FOUND
+    )
