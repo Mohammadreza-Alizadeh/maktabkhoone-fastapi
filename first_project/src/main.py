@@ -91,7 +91,7 @@ def delete_expense(
 
 
 @app.put("/expenses/{id}")
-def delete_expense(
+def update_expense(
     expense_id: Annotated[
         int,
         Path(
